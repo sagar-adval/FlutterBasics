@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:convert';
 
-import './firstpage.dart' as firstpage;
-import './secondpage.dart' as secondpage;
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(MyApp());
@@ -46,27 +47,25 @@ class _MyHomePageState extends State<MyHomePage>
     super.dispose();
   }
 
+  String url = 'https://randomuser.me/api/';
+
+  Future<String> makeRequest() async {
+    var response = await http
+        .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
+    List data;
+    var extractData = jsonDecode(response.body);
+    data = extractData["results"];
+    print(data[0]["name"]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: new AppBar(title: new Text('Tabs App')),
-        bottomNavigationBar: new Material(
-          color: Colors.teal,
-          child: new TabBar(controller: controller, tabs: <Widget>[
-            new Tab(
-              icon: new Icon(Icons.access_alarm),
-            ),
-            new Tab(
-              icon: new Icon(Icons.account_balance),
-            )
-          ]),
-        ),
-        body: new TabBarView(
-          controller: controller,
-          children: <Widget>[
-            new firstpage.FirstPage(),
-            new secondpage.SecondPage()
-          ],
-        ));
+        body: new Center(
+      child: new RaisedButton(
+        onPressed: makeRequest,
+        child: new Text('Make Request'),
+      ),
+    ));
   }
 }
